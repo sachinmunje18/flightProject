@@ -8,6 +8,8 @@ import com.flight.model.Booking;
 import com.flight.service.BookingService;
 import com.flight.vo.BookingVO;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/bookings")
 public class BookingController {
@@ -25,10 +27,10 @@ public class BookingController {
         }
     }
 
-    @PostMapping("/updateBooking")
-    public ResponseEntity<String> updateBooking(@RequestBody BookingVO bookingVO) {
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateBooking(@PathVariable("id") Long id, @RequestBody BookingVO bookingVO) {
         try {
-            Booking existingBooking = bookingService.getBookingById(bookingVO.getId());
+            Booking existingBooking = bookingService.getBookingById(id);
             if (existingBooking != null) {
                 // Update only specific fields
                 if (bookingVO.getName() != null) {
@@ -40,7 +42,7 @@ public class BookingController {
                 if (bookingVO.getAddress() != null) {
                     existingBooking.setAddress(bookingVO.getAddress());
                 }
-                bookingService.saveBooking(existingBooking);
+                bookingService.updateBooking(existingBooking);
                 return ResponseEntity.ok("Booking updated successfully!");
             } else {
                 return ResponseEntity.status(404).body("Booking not found.");
@@ -62,6 +64,30 @@ public class BookingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to cancel booking. Please try again.");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Booking>> getAllBookings() {
+        try {
+            List<Booking> bookings = bookingService.getAllBookings();
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Booking> getBookingById(@PathVariable("id") Long id) {
+        try {
+            Booking booking = bookingService.getBookingById(id);
+            if (booking != null) {
+                return ResponseEntity.ok(booking);
+            } else {
+                return ResponseEntity.status(404).body(null);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
         }
     }
 }

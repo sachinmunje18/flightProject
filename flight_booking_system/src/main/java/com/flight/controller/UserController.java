@@ -1,6 +1,8 @@
 // src/main/java/com/flight/controller/UserController.java
 package com.flight.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +22,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveUser(@RequestBody UserVo uservo) {
         User user = User.builder()
                 .name(uservo.getName())
@@ -28,10 +30,11 @@ public class UserController {
                 .password(uservo.getPassword())
                 .build();
         userService.registerMember(user);
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("{\"message\": \"User registered successfully!\"}");
     }
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> loginUser(@RequestBody UserVo uservo) {
         User user = User.builder()
                         .email(uservo.getEmail())
@@ -41,9 +44,10 @@ public class UserController {
         User getUser = userService.EmailAndPassword(user.getEmail(), user.getPassword());
 
         if (getUser != null) {
-            return ResponseEntity.ok("LOGIN SUCCESSFULLY!");
+            return ResponseEntity.ok("{\"message\": \"LOGIN SUCCESSFULLY!\"}");
         } else {
-            return ResponseEntity.status(401).body("INVALID login");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("{\"message\": \"INVALID login\"}");
         }
     }
 }
