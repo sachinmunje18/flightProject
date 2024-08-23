@@ -27,12 +27,12 @@ public class BookingController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<String> updateBooking(@PathVariable("id") Long id, @RequestBody BookingVO bookingVO) {
         try {
             Booking existingBooking = bookingService.getBookingById(id);
             if (existingBooking != null) {
-                // Update only specific fields
+                // Update specific fields
                 if (bookingVO.getName() != null) {
                     existingBooking.setName(bookingVO.getName());
                 }
@@ -42,7 +42,7 @@ public class BookingController {
                 if (bookingVO.getAddress() != null) {
                     existingBooking.setAddress(bookingVO.getAddress());
                 }
-                bookingService.updateBooking(existingBooking);
+                bookingService.saveBooking(existingBooking);
                 return ResponseEntity.ok("Booking updated successfully!");
             } else {
                 return ResponseEntity.status(404).body("Booking not found.");
